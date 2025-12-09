@@ -1,309 +1,330 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>OS Recommendation Assistant</title>
-  <style>
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-    }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Universe Question Generator</title>
 
-    body {
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-      height: 100vh;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      padding: 20px;
-    }
+<!-- JetBrains Mono font -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
 
-    .container {
-      background: white;
-      border-radius: 16px;
-      box-shadow: 0 20px 60px rgba(0,0,0,0.3);
-      width: 100%;
-      max-width: 900px;
-      height: 90vh;
-      display: flex;
-      flex-direction: column;
-      overflow: hidden;
-    }
+<style>
+  body {
+    font-family: "JetBrains Mono", monospace;
+    background: #121212;
+    color: white;
+    padding: 20px;
+  }
+  #quiz { max-width: 700px; margin: 0 auto; background: #1e1e1e; padding: 20px; border-radius: 10px; }
+  button { font-family: inherit; margin-top: 10px; padding: 8px 12px; }
+  h1 { text-align: center; }
+</style>
 
-    .header {
-      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-      color: white;
-      padding: 20px;
-      text-align: center;
-    }
-
-    .header h1 {
-      font-size: 24px;
-      margin-bottom: 5px;
-    }
-
-    .header p {
-      font-size: 14px;
-      opacity: 0.9;
-    }
-
-    #chat {
-      flex: 1;
-      overflow-y: auto;
-      padding: 20px;
-      background: #f7f7f7;
-    }
-
-    .message {
-      margin-bottom: 16px;
-      padding: 12px 16px;
-      border-radius: 12px;
-      max-width: 80%;
-      word-wrap: break-word;
-      animation: fadeIn 0.3s;
-    }
-
-    @keyframes fadeIn {
-      from { opacity: 0; transform: translateY(10px); }
-      to { opacity: 1; transform: translateY(0); }
-    }
-
-    .message.user {
-      background: #667eea;
-      color: white;
-      margin-left: auto;
-      text-align: right;
-    }
-
-    .message.bot {
-      background: white;
-      color: #333;
-      border: 1px solid #e0e0e0;
-    }
-
-    #comparison-table {
-      margin: 20px 0;
-      animation: fadeIn 0.5s;
-    }
-
-    #comparison-table h2 {
-      color: #667eea;
-      margin-bottom: 15px;
-      font-size: 20px;
-    }
-
-    table {
-      width: 100%;
-      border-collapse: collapse;
-      background: white;
-      border-radius: 8px;
-      overflow: hidden;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-    }
-
-    th, td {
-      padding: 12px;
-      text-align: left;
-      border-bottom: 1px solid #e0e0e0;
-    }
-
-    th {
-      background: #667eea;
-      color: white;
-      font-weight: 600;
-    }
-
-    tr:last-child td {
-      border-bottom: none;
-    }
-
-    tbody tr:hover {
-      background: #f5f5f5;
-    }
-
-    .input-area {
-      padding: 20px;
-      background: white;
-      border-top: 1px solid #e0e0e0;
-      display: flex;
-      gap: 10px;
-    }
-
-    #user-input {
-      flex: 1;
-      padding: 12px 16px;
-      border: 2px solid #e0e0e0;
-      border-radius: 24px;
-      font-size: 14px;
-      outline: none;
-      transition: border-color 0.3s;
-    }
-
-    #user-input:focus {
-      border-color: #667eea;
-    }
-
-    #send-btn {
-      padding: 12px 24px;
-      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-      color: white;
-      border: none;
-      border-radius: 24px;
-      cursor: pointer;
-      font-weight: 600;
-      transition: transform 0.2s, box-shadow 0.2s;
-    }
-
-    #send-btn:hover:not(:disabled) {
-      transform: translateY(-2px);
-      box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
-    }
-
-    #send-btn:disabled {
-      opacity: 0.6;
-      cursor: not-allowed;
-    }
-  </style>
 </head>
 <body>
-  <div class="container">
-    <div class="header">
-      <h1>🖥️ OS Recommendation Assistant</h1>
-      <p>Let me help you find the perfect operating system for your needs!</p>
-    </div>
+<div id="quiz">
+    <h1>Universe Question Generator</h1>
     
-    <div id="chat">
-      <div class="message bot">
-        Hi there! 👋 I'm here to help you choose the right operating system. What will you be using your computer for? (e.g., gaming, programming, work, general use)
-      </div>
-    </div>
-    
-    <div class="input-area">
-      <input type="text" id="user-input" placeholder="Type your response here..." autocomplete="off">
-      <button id="send-btn">Send</button>
-    </div>
-  </div>
+    <h2 id="question-box"></h2>
 
-  <script>
-    const chat = document.getElementById('chat');
-    const inputField = document.getElementById('user-input');
-    const sendBtn = document.getElementById('send-btn');
+    <div id="choices"></div>
 
-    let osRecommendationGiven = false;
+    <button onclick="checkAnswer()">Submit</button>
 
-    function addMessage(text, sender) {
-      const msg = document.createElement('div');
-      msg.classList.add('message', sender);
-      msg.textContent = text;
-      chat.appendChild(msg);
-      chat.scrollTop = chat.scrollHeight;
+    <p id="result"></p>
+</div>
+
+<script>
+
+// shuffle helper
+function shuffle(arr){
+    for (let i = arr.length - 1; i > 0; i--){
+        const j = Math.floor(Math.random() * (i + 1));
+        [arr[i], arr[j]] = [arr[j], arr[i]];
     }
+    return arr;
+}
 
-    function showComparisonTable(recommendedOS) {
-      // Only show the recommended OS, not the full table
-      const osData = {
-        'Windows 11': { performance: 'High', stability: 'Good', security: 'Medium', gaming: 'Excellent', custom: 'Medium' },
-        'Ubuntu': { performance: 'Medium', stability: 'Good', security: 'High', gaming: 'Low', custom: 'High' },
-        'Pop!_OS': { performance: 'Medium-High', stability: 'Good', security: 'High', gaming: 'Medium', custom: 'High' },
-        'Fedora': { performance: 'Medium', stability: 'Good', security: 'High', gaming: 'Low-Medium', custom: 'High' },
-        'Manjaro': { performance: 'High', stability: 'Medium', security: 'High', gaming: 'Medium', custom: 'High' },
-        'Bazzite': { performance: 'High', stability: 'Medium', security: 'High', gaming: 'Medium', custom: 'Very High' },
-        'SteamOS': { performance: 'Medium', stability: 'Medium', security: 'High', gaming: 'Excellent', custom: 'Medium' },
-        'CachyOS': { performance: 'High', stability: 'Medium', security: 'High', gaming: 'Good', custom: 'Very High' }
-      };
+// FULL QUESTION BANK
+const questions = [
 
-      if (!recommendedOS || !osData[recommendedOS]) return;
+{q:"What is the closest star to Earth?",
+ a:"The Sun",
+ c:[
+   "The Sun",
+   "Proxima Centauri",
+   "Alpha Centauri",
+   "A giant light bulb in the sky"
+ ]},
 
-      const data = osData[recommendedOS];
-      const tableHTML = `
-        <div id="comparison-table">
-          <h2>📊 ${recommendedOS} Specs</h2>
-          <table>
-            <thead>
-              <tr>
-                <th>Feature</th>
-                <th>Rating</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr><td>Performance</td><td>${data.performance}</td></tr>
-              <tr><td>Stability</td><td>${data.stability}</td></tr>
-              <tr><td>Security</td><td>${data.security}</td></tr>
-              <tr><td>Gaming Support</td><td>${data.gaming}</td></tr>
-              <tr><td>Customizability</td><td>${data.custom}</td></tr>
-            </tbody>
-          </table>
-        </div>
-      `;
-      
-      const existingTable = chat.querySelector('#comparison-table');
-      if (existingTable) {
-        existingTable.remove();
-      }
-      
-      chat.insertAdjacentHTML('beforeend', tableHTML);
-      chat.scrollTop = chat.scrollHeight;
-    }
+{q:"Which galaxy do we live in?",
+ a:"The Milky Way",
+ c:[
+   "The Milky Way",
+   "Andromeda",
+   "Triangulum Galaxy",
+   "The Minecraft Realm"
+ ]},
 
-    function getRecommendation(userText, hardware = null) {
-      const lowerText = userText.toLowerCase();
-      
-      if (lowerText.includes('online gaming') || lowerText.includes('multiplayer')) {
-        return { text: "Windows 11", os: "Windows 11" };
-      }
-      
-      if (lowerText.includes('gaming') || lowerText.includes('game')) {
-        return { text: "Bazzite, SteamOS, or CachyOS", os: "Bazzite" };
-      }
-      
-      if (lowerText.includes('work') || lowerText.includes('office') || lowerText.includes('productivity')) {
-        return { text: "Windows 11 or Ubuntu", os: "Windows 11" };
-      }
-      
-      if (lowerText.includes('programming') || lowerText.includes('development') || lowerText.includes('coding')) {
-        return { text: "Ubuntu, Fedora, or Manjaro", os: "Ubuntu" };
-      }
-      
-      if (lowerText.includes('general') || lowerText.includes('everyday') || lowerText.includes('browsing')) {
-        return { text: "Windows 11 or Ubuntu", os: "Windows 11" };
-      }
-      
-      return { text: "Please tell me your main use case: gaming, programming, work, or general use.", os: null };
-    }
+{q:"What force keeps planets in orbit around the Sun?",
+ a:"Gravity",
+ c:[
+   "Gravity",
+   "Magnetism",
+   "Dark Matter",
+   "Super Glue"
+ ]},
 
-    function handleUserInput(e = null) {
-      if (e) e.preventDefault();
-      const userText = inputField.value.trim();
-      if (!userText) return false;
+{q:"What is the largest planet in the solar system?",
+ a:"Jupiter",
+ c:[
+   "Jupiter",
+   "Saturn",
+   "Uranus",
+   "Planet McHugeface"
+ ]},
 
-      addMessage(userText, 'user');
-      inputField.value = '';
-      sendBtn.disabled = true;
+{q:"Which planet is known as the Red Planet?",
+ a:"Mars",
+ c:[
+   "Mars",
+   "Venus",
+   "Jupiter",
+   "The Angry Planet"
+ ]},
 
-      setTimeout(() => {
-        const result = getRecommendation(userText);
-        addMessage(result.text, 'bot');
-        
-        if (result.os) {
-          showComparisonTable(result.os);
-        }
+{q:"Name all the terrestrial planets.",
+ a:"Mercury, Venus, Earth, Mars",
+ c:[
+   "Mercury, Venus, Earth, Mars",
+   "Jupiter, Saturn, Uranus, Neptune",
+   "Earth, Mars, Jupiter, Venus",
+   "All of them including Pluto riding a skateboard"
+ ]},
 
-        sendBtn.disabled = false;
-        inputField.focus();
-      }, 500);
+{q:"Which planets are gas giants?",
+ a:"Jupiter, Saturn, Uranus, Neptune",
+ c:[
+   "Jupiter, Saturn, Uranus, Neptune",
+   "Mercury, Earth, Mars, Venus",
+   "Earth, Jupiter, Pluto, Mars",
+   "The ones that go brrrr"
+ ]},
 
-      return false;
-    }
+{q:"What is the name of our galaxy’s nearest large galactic neighbor?",
+ a:"Andromeda",
+ c:[
+   "Andromeda",
+   "Milky Way",
+   "Triangulum",
+   "Disneyland Galaxy"
+ ]},
 
-    sendBtn.addEventListener('click', handleUserInput);
-    inputField.addEventListener('keypress', (e) => {
-      if (e.key === 'Enter') handleUserInput(e);
+{q:"What is the center of a solar system called?",
+ a:"The star",
+ c:[
+   "The star",
+   "The biggest planet",
+   "The asteroid belt",
+   "The chicken nugget core"
+ ]},
+
+{q:"What protects Earth from solar radiation?",
+ a:"The magnetic field",
+ c:[
+   "The magnetic field",
+   "The ozone layer",
+   "The Van Allen belts",
+   "A giant cosmic sunscreen"
+ ]},
+
+{q:"What do we call a star at the end of its lifecycle that explodes?",
+ a:"Supernova",
+ c:[
+   "Supernova",
+   "Nebula",
+   "Red Giant",
+   "Star go boom"
+ ]},
+
+{q:"What is a galaxy?",
+ a:"A huge collection of stars, gas, and dust",
+ c:[
+   "A huge collection of stars, gas, and dust",
+   "Just a bunch of planets",
+   "A single star",
+   "A space burrito"
+ ]},
+
+{q:"What is the name of Earth’s moon?",
+ a:"The Moon",
+ c:[
+   "The Moon",
+   "Luna Prime",
+   "Europa",
+   "Cheese Orb"
+ ]},
+
+{q:"What are comets mostly made of?",
+ a:"Ice and dust",
+ c:[
+   "Ice and dust",
+   "Hot lava",
+   "Metal",
+   "Frozen tears of astronauts"
+ ]},
+
+{q:"What phase happens when the Moon is completely dark?",
+ a:"New Moon",
+ c:[
+   "New Moon",
+   "Full Moon",
+   "Crescent Moon",
+   "Moon turned off to save power"
+ ]},
+
+{q:"What is the hottest planet in the solar system?",
+ a:"Venus",
+ c:[
+   "Venus",
+   "Mercury",
+   "Jupiter",
+   "Hot Pocket Planet"
+ ]},
+
+{q:"What planet has a big red storm called the Great Red Spot?",
+ a:"Jupiter",
+ c:[
+   "Jupiter",
+   "Mars",
+   "Saturn",
+   "Angry Circle Thing"
+ ]},
+
+{q:"What shape are most galaxies?",
+ a:"Spiral",
+ c:[
+   "Spiral",
+   "Square",
+   "Triangle",
+   "Donut-shaped munchies"
+ ]},
+
+{q:"What is the name of the nearest black hole we’ve detected?",
+ a:"Sagittarius A*",
+ c:[
+   "Sagittarius A*",
+   "Andromeda B",
+   "Alpha Hole",
+   "Space Vacuum Cleaner"
+ ]},
+
+{q:"What is a light-year?",
+ a:"The distance light travels in one year",
+ c:[
+   "The distance light travels in one year",
+   "A measure of time",
+   "How long stars live",
+   "A year with extra photons"
+ ]},
+
+{q:"What do we call frozen rocks entering Earth’s atmosphere?",
+ a:"Meteors",
+ c:[
+   "Meteors",
+   "Asteroids",
+   "Comets",
+   "Fire shooting space peas"
+ ]},
+
+{q:"What happens when a star collapses under its own gravity?",
+ a:"It becomes a black hole",
+ c:[
+   "It becomes a black hole",
+   "It becomes a comet",
+   "It explodes immediately",
+   "It goes to sleep forever"
+ ]},
+
+{q:"Why does the Moon have phases?",
+ a:"We see different amounts of its lit side",
+ c:[
+   "We see different amounts of its lit side",
+   "It changes size",
+   "The Sun turns it",
+   "It’s moody"
+ ]},
+
+{q:"What planet rotates on its side?",
+ a:"Uranus",
+ c:[
+   "Uranus",
+   "Neptune",
+   "Jupiter",
+   "The goofy tilted one"
+ ]},
+
+{q:"What do astronauts need to breathe in space?",
+ a:"Oxygen",
+ c:[
+   "Oxygen",
+   "Carbon dioxide",
+   "Hydrogen",
+   "Stardust"
+ ]},
+
+{q:"What creates the auroras?",
+ a:"Solar wind interacting with Earth’s magnetic field",
+ c:[
+   "Solar wind interacting with Earth’s magnetic field",
+   "Lightning from space",
+   "Volcanoes erupting",
+   "Cosmic disco lights"
+ ]}
+];
+
+let index = 0;
+let currentQuestion = null;
+
+function nextQuestion() {
+
+    currentQuestion = questions[index];
+
+    document.getElementById("question-box").innerText = currentQuestion.q;
+
+    shuffle(currentQuestion.c);
+
+    let html = "";
+    currentQuestion.c.forEach(choice => {
+        html += `<label><input type="radio" name="answer" value="${choice}"> ${choice}</label><br>`;
     });
+    document.getElementById("choices").innerHTML = html;
 
-    inputField.focus();
-  </script>
+    index++;
+    if(index >= questions.length){
+        index = 0; // loop
+    }
+
+    document.getElementById("result").innerText = "";
+}
+
+function checkAnswer(){
+    let selected = document.querySelector('input[name="answer"]:checked');
+    if(!selected){ alert("Choose an answer!"); return; }
+
+    if(selected.value === currentQuestion.a){
+        document.getElementById("result").innerText = "Correct!";
+    } else {
+        document.getElementById("result").innerText = "Incorrect.";
+    }
+
+    setTimeout(nextQuestion, 1000);
+}
+
+nextQuestion();
+
+</script>
 </body>
 </html>
