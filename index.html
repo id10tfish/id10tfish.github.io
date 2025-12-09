@@ -1,72 +1,59 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1" />
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>OS Recommender</title>
-
 <style>
-  body{
-    font-family: Arial;
-    max-width:600px;
-    margin:2rem auto;
-    background:#f9f9f9;
+  body {
+    font-family: Arial, sans-serif;
+    max-width: 600px;
+    margin: 2rem auto;
+    background: #f9f9f9;
   }
-  #chat{
-    background:white;
-    border:1px solid #ddd;
-    height:350px;
-    overflow-y:auto;
-    padding:10px;
-    border-radius:6px;
-    margin-bottom:1rem;
+  h1 { text-align:center; }
+  #chat {
+    background: white;
+    border: 1px solid #ddd;
+    height: 350px;
+    overflow-y: auto;
+    padding: 10px;
+    border-radius: 6px;
+    margin-bottom: 1rem;
   }
-  .message{
-    margin:10px 0;
-    padding:8px 12px;
-    border-radius:15px;
-    max-width:80%;
+  .message {
+    margin: 10px 0;
+    padding: 8px 12px;
+    border-radius: 15px;
+    max-width: 80%;
+    word-wrap: break-word;
   }
-  .user{
-    background:#007bff;
-    color:white;
-    margin-left:auto;
-  }
-  .bot{
-    background:#eee;
-    margin-right:auto;
-  }
-  #input-area{
-    display:flex;
-    gap:10px;
-  }
-  input{ flex:1;padding:10px;border:1px solid #ccc;border-radius:6px; }
-  button{
+  .user { background: #007bff; color: white; margin-left:auto; }
+  .bot { background: #eee; color: #333; margin-right:auto; }
+  #input-area { display: flex; gap: 10px; }
+  input { flex:1; padding:10px; border-radius:6px; border:1px solid #ccc; }
+  button {
     padding:10px 20px;
     background:#007bff;
-    border:0;
+    border:none;
     border-radius:6px;
     color:white;
+    cursor:pointer;
   }
-  table{
-    width:100%;border-collapse:collapse;margin-top:1rem;
-  }
-  td,th{
-    border:1px solid #bbb;
-    padding:6px;
-    text-align:center;
-  }
-  th{ background:#eee; }
+  button:disabled { background:#aaa; cursor:not-allowed; }
+  table { width:100%; border-collapse: collapse; margin-top:1rem; }
+  th, td { border:1px solid #bbb; padding:6px; text-align:center; }
+  th { background:#eee; }
 </style>
 </head>
-
 <body>
 
 <h1>OS Recommender 🤖</h1>
+
 <div id="chat"></div>
 
 <div id="input-area">
-  <input id="userInput" placeholder="What will you use this for?">
+  <input id="userInput" placeholder="What will you use this for?" autocomplete="off">
   <button id="sendBtn">Send</button>
 </div>
 
@@ -82,4 +69,76 @@ let asked = false;
 let askHardware = false;
 
 function addMsg(text, sender){
-  chat.innerHTML += `<div class="message ${sender}">${text}</div>`
+  const div = document.createElement("div");
+  div.className = `message ${sender}`;
+  div.textContent = text;
+  chat.appendChild(div);
+  chat.scrollTop = chat.scrollHeight;
+}
+
+function recommend(text, hardware){
+  text = text.toLowerCase();
+  if(text.includes("online gaming")) return "For online gaming, I recommend Windows 11 — best compatibility and performance.";
+  if(text.includes("gaming")) return "For gaming, try Bazzite, SteamOS, or CachyOS if you like tinkering.";
+  if(hardware){
+    if(hardware.includes("low")) return "With low-end hardware, consider Ubuntu or lightweight distros like Manjaro.";
+    if(hardware.includes("high")) return "For high-end hardware, Fedora or Pop!_OS provide good performance and features.";
+  }
+  if(text.includes("work") || text.includes("office")) return "For work or office use, Windows 11 or Ubuntu are solid choices.";
+  if(text.includes("programming") || text.includes("development")) return "For programming, Linux distros like Ubuntu, Fedora, or Manjaro are excellent.";
+  if(text.includes("general") || text.includes("everyday")) return "For general use, Windows 11 or Ubuntu are great options.";
+  return "Could you please specify your main use case? For example, gaming, programming, work, or general use.";
+}
+
+function showTable(){
+  table.innerHTML = `
+    <h2>OS Comparison Table</h2>
+    <table>
+      <tr><th>OS</th><th>Performance</th><th>Stability</th><th>Security</th><th>Gaming</th><th>Customizability</th></tr>
+      <tr><td>Windows 11</td><td>High</td><td>Good</td><td>Medium</td><td>Excellent</td><td>Medium</td></tr>
+      <tr><td>Ubuntu</td><td>Medium</td><td>Good</td><td>High</td><td>Low</td><td>High</td></tr>
+      <tr><td>Pop!_OS</td><td>Medium-High</td><td>Good</td><td>High</td><td>Medium</td><td>High</td></tr>
+      <tr><td>Fedora</td><td>Medium</td><td>Good</td><td>High</td><td>Low-Medium</td><td>High</td></tr>
+      <tr><td>Manjaro</td><td>High</td><td>Medium</td><td>High</td><td>Medium</td><td>High</td></tr>
+      <tr><td>Bazzite</td><td>High</td><td>Medium</td><td>High</td><td>Medium</td><td>Very High</td></tr>
+      <tr><td>SteamOS</td><td>Medium</td><td>Medium</td><td>High</td><td>Excellent</td><td>Medium</td></tr>
+      <tr><td>CachyOS</td><td>High</td><td>Medium</td><td>High</td><td>Good</td><td>Very High</td></tr>
+    </table>
+  `;
+}
+
+function handle(event){
+  if(event) event.preventDefault();
+  const text = input.value.trim();
+  if(!text) return;
+
+  addMsg(text,"user");
+  input.value="";
+
+  setTimeout(()=>{
+    let reply;
+    if(!asked){
+      reply = recommend(text);
+      addMsg(reply,"bot");
+      if(reply.toLowerCase().includes("hardware") || reply.toLowerCase().includes("specify")) askHardware = true;
+      else if(!text.toLowerCase().includes("gaming")) showTable();
+      asked = true;
+    } else if(askHardware){
+      reply = recommend("", text);
+      addMsg(reply,"bot");
+      showTable();
+      askHardware = false;
+    } else {
+      reply = recommend(text);
+      addMsg(reply,"bot");
+    }
+  }, 400);
+}
+
+btn.addEventListener("click", handle);
+input.addEventListener("keypress", e=>{ if(e.key==="Enter") handle(e); });
+input.focus();
+</script>
+
+</body>
+</html>
