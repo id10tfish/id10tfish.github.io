@@ -289,7 +289,6 @@
         botReply = getRecommendation(userText);
         addMessage(botReply, 'bot');
       }
-\\
       conversation.push({ role: 'user', content: userText });
       sendBtn.disabled = false;
       inputField.focus();
