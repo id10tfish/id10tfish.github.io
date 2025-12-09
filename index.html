@@ -4,310 +4,82 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>OS Recommender</title>
+
 <style>
-  body {
-    font-family: Arial, sans-serif;
-    max-width: 600px;
-    margin: 2rem auto;
-    background: #f9f9f9;
+  body{
+    font-family: Arial;
+    max-width:600px;
+    margin:2rem auto;
+    background:#f9f9f9;
   }
-  h1 {
-    text-align: center;
+  #chat{
+    background:white;
+    border:1px solid #ddd;
+    height:350px;
+    overflow-y:auto;
+    padding:10px;
+    border-radius:6px;
+    margin-bottom:1rem;
   }
-  #chat {
-    background: white;
-    border: 1px solid #ddd;
-    height: 350px;
-    overflow-y: auto;
-    padding: 10px;
-    margin-bottom: 1rem;
-    border-radius: 6px;
+  .message{
+    margin:10px 0;
+    padding:8px 12px;
+    border-radius:15px;
+    max-width:80%;
   }
-  .message {
-    margin: 10px 0;
-    padding: 8px 12px;
-    border-radius: 15px;
-    max-width: 80%;
-    word-wrap: break-word;
+  .user{
+    background:#007bff;
+    color:white;
+    margin-left:auto;
   }
-  .user {
-    background-color: #007bff;
-    color: white;
-    align-self: flex-end;
-    margin-left: auto;
+  .bot{
+    background:#eee;
+    margin-right:auto;
   }
-  .bot {
-    background-color: #e2e2e2;
-    color: #333;
-    align-self: flex-start;
-    margin-right: auto;
+  #input-area{
+    display:flex;
+    gap:10px;
   }
-  #input-area {
-    display: flex;
+  input{ flex:1;padding:10px;border:1px solid #ccc;border-radius:6px; }
+  button{
+    padding:10px 20px;
+    background:#007bff;
+    border:0;
+    border-radius:6px;
+    color:white;
   }
-  input[type="text"] {
-    flex-grow: 1;
-    padding: 10px;
-    font-size: 1rem;
-    border-radius: 6px;
-    border: 1px solid #ccc;
+  table{
+    width:100%;border-collapse:collapse;margin-top:1rem;
   }
-  button {
-    padding: 10px 20px;
-    margin-left: 10px;
-    background-color: #007bff;
-    border: none;
-    color: white;
-    border-radius: 6px;
-    cursor: pointer;
-    font-weight: bold;
+  td,th{
+    border:1px solid #bbb;
+    padding:6px;
+    text-align:center;
   }
-  button:disabled {
-    background-color: #aaa;
-    cursor: not-allowed;
-  }
-  #comparison-table {
-    margin-top: 1rem;
-    background: white;
-    border: 1px solid #ddd;
-    padding: 15px;
-    border-radius: 6px;
-  }
-  table {
-    width: 100%;
-    border-collapse: collapse;
-  }
-  th, td {
-    border: 1px solid #bbb;
-    padding: 8px;
-    text-align: center;
-  }
-  th {
-    background-color: #f0f0f0;
-  }
+  th{ background:#eee; }
 </style>
 </head>
+
 <body>
 
 <h1>OS Recommender 🤖</h1>
-
 <div id="chat"></div>
 
 <div id="input-area">
-  <input type="text" id="user-input" placeholder="What will you use this for?" autocomplete="off" />
-  <button id="send-btn">Send</button>
+  <input id="userInput" placeholder="What will you use this for?">
+  <button id="sendBtn">Send</button>
 </div>
 
-<div id="comparison-table"></div>
+<div id="table"></div>
 
 <script>
-  const chat = document.getElementById('chat');
-  const inputField = document.getElementById('user-input');
-  const sendBtn = document.getElementById('send-btn');
-  const comparisonTableDiv = document.getElementById('comparison-table');
+const chat = document.getElementById("chat");
+const input = document.getElementById("userInput");
+const btn = document.getElementById("sendBtn");
+const table = document.getElementById("table");
 
-  let osRecommendationGiven = false;
-  let expectHardware = false;
-  let conversation = [];
+let asked = false;
+let askHardware = false;
 
-  // Add message to chat
-  function addMessage(text, sender) {
-    const msg = document.createElement('div');
-    msg.classList.add('message', sender);
-    msg.textContent = text;
-    chat.appendChild(msg);
-    chat.scrollTop = chat.scrollHeight;
-  }
-
-  // Show OS comparison table in separate div
-  function showComparisonTable() {
-    const tableHTML = `
-      <h2>OS Comparison Table</h2>
-      <table>
-        <thead>
-          <tr>
-            <th>OS</th>
-            <th>Performance</th>
-            <th>Stability</th>
-            <th>Security</th>
-            <th>Gaming Support</th>
-            <th>Customizability</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr>
-            <td>Windows 11</td>
-            <td>High</td>
-            <td>Good</td>
-            <td>Medium</td>
-            <td>Excellent</td>
-            <td>Medium</td>
-          </tr>
-          <tr>
-            <td>Ubuntu</td>
-            <td>Medium</td>
-            <td>Good</td>
-            <td>High</td>
-            <td>Low</td>
-            <td>High</td>
-          </tr>
-          <tr>
-            <td>Pop!_OS</td>
-            <td>Medium-High</td>
-            <td>Good</td>
-            <td>High</td>
-            <td>Medium</td>
-            <td>High</td>
-          </tr>
-          <tr>
-            <td>Fedora</td>
-            <td>Medium</td>
-            <td>Good</td>
-            <td>High</td>
-            <td>Low-Medium</td>
-            <td>High</td>
-          </tr>
-          <tr>
-            <td>Manjaro</td>
-            <td>High</td>
-            <td>Medium</td>
-            <td>High</td>
-            <td>Medium</td>
-            <td>High</td>
-          </tr>
-          <tr>
-            <td>Bazzite</td>
-            <td>High</td>
-            <td>Medium</td>
-            <td>High</td>
-            <td>Medium</td>
-            <td>Very High</td>
-          </tr>
-          <tr>
-            <td>SteamOS</td>
-            <td>Medium</td>
-            <td>Medium</td>
-            <td>High</td>
-            <td>Excellent</td>
-            <td>Medium</td>
-          </tr>
-          <tr>
-            <td>CachyOS</td>
-            <td>High</td>
-            <td>Medium</td>
-            <td>High</td>
-            <td>Good</td>
-            <td>Very High</td>
-          </tr>
-        </tbody>
-      </table>
-    `;
-    comparisonTableDiv.innerHTML = tableHTML;
-  }
-
-  // Recommendation logic
-  function getRecommendation(userText, hardware = null) {
-    userText = userText.toLowerCase();
-
-    // Online gaming gets highest priority
-    if (userText.includes('online gaming')) {
-      return "For online gaming, I recommend Windows 11 — best compatibility and performance.";
-    }
-
-    // Gaming (local) recommendations
-    if (userText.includes('gaming')) {
-      return "For gaming, you might want to try Bazzite, SteamOS, or CachyOS if you like tinkering.";
-    }
-
-    // If hardware info requested (e.g. "I have a low-end laptop")
-    if (hardware) {
-      if (hardware.includes('low')) {
-        return "With low-end hardware, consider Ubuntu or lightweight distros like Manjaro.";
-      }
-      if (hardware.includes('high')) {
-        return "For high-end hardware, Fedora or Pop!_OS provide good performance and features.";
-      }
-      return "Thanks for the hardware info! You have many good choices depending on your preferences.";
-    }
-
-    // General usage recommendations
-    if (userText.includes('work') || userText.includes('office')) {
-      return "For work or office use, Windows 11 or Ubuntu are solid choices.";
-    }
-
-    if (userText.includes('programming') || userText.includes('development')) {
-      return "For programming, Linux distros like Ubuntu, Fedora, or Manjaro are excellent.";
-    }
-
-    if (userText.includes('general') || userText.includes('everyday')) {
-      return "For general use, Windows 11 or Ubuntu are great options.";
-    }
-
-    // If unsure or first question
-    return "Could you please specify your main use case? For example, gaming, programming, work, or general use.";
-  }
-
-  // Handle user input and bot response
-  function handleUserInput(event) {
-    event.preventDefault();
-
-    const userText = inputField.value.trim();
-    if (!userText) return false;
-
-    addMessage(userText, 'user');
-    inputField.value = '';
-    sendBtn.disabled = true;
-
-    setTimeout(() => {
-      let botReply;
-
-      // First question: get recommendation
-      if (!osRecommendationGiven) {
-        botReply = getRecommendation(userText);
-        addMessage(botReply, 'bot');
-
-        // Ask for hardware info only if needed
-        if (botReply.toLowerCase().includes('hardware') || botReply.toLowerCase().includes('specify')) {
-          expectHardware = true;
-        } 
-        // Show table only if NOT gaming/online gaming
-        else if (!userText.toLowerCase().includes('gaming') && !userText.toLowerCase().includes('online gaming')) {
-          showComparisonTable();
-        }
-
-        osRecommendationGiven = true;
-      } 
-      // Second input: hardware info expected
-      else if (expectHardware) {
-        botReply = getRecommendation(conversation[conversation.length - 1].content, userText.toLowerCase());
-        addMessage(botReply, 'bot');
-        showComparisonTable();
-        expectHardware = false;
-      } 
-      // Additional inputs
-      else {
-        botReply = getRecommendation(userText);
-        addMessage(botReply, 'bot');
-      }
-\\
-      conversation.push({ role: 'user', content: userText });
-      sendBtn.disabled = false;
-      inputField.focus();
-    }, 500);
-
-    return false;
-  }
-
-  sendBtn.addEventListener('click', handleUserInput);
-  inputField.addEventListener('keypress', (e) => {
-    if (e.key === 'Enter') {
-      handleUserInput(e);
-    }
-  });
-
-  // Focus input on load
-  inputField.focus();
-</script>
-
-</body>
-</html>
+function addMsg(text, sender){
+  chat.innerHTML += `<div class="message ${sender}">${text}</div>`
