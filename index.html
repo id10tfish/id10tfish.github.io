@@ -5,7 +5,6 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Universe Question Generator</title>
 
-<!-- JetBrains Mono font -->
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
@@ -32,13 +31,12 @@
 
     <div id="choices"></div>
 
-    <button id="submit-btn" onclick="checkAnswer()" disabled>Submit</button>
+    <button id="submit-btn" onclick="checkAnswer()" disabled>Submit</button> 
 
     <p id="result"></p>
 </div>
 
 <script>
-
 // shuffle helper
 function shuffle(arr){
     for (let i = arr.length - 1; i > 0; i--){
@@ -48,260 +46,96 @@ function shuffle(arr){
     return arr;
 }
 
-// FULL QUESTION BANK
-const questions = [
+// show black screen with message
+function stupidYes(){
+    document.body.innerHTML = `
+        <div style="
+            width:100vw;
+            height:100vh;
+            display:flex;
+            justify-content:center;
+            align-items:center;
+            background:black;
+            color:white;
+            font-family:'Times New Roman', serif;
+            font-size:50px;
+            text-align:center;
+        ">
+            You are an idiot
+        </div>
+    `;
+}
 
-{q:"What is the closest star to Earth?",
- a:"The Sun",
- c:[
-   "The Sun",
-   "Proxima Centauri",
-   "Alpha Centauri",
-   "A giant light bulb in the sky"
- ]},
-
-{q:"Which galaxy do we live in?",
- a:"The Milky Way",
- c:[
-   "The Milky Way",
-   "Andromeda",
-   "Triangulum Galaxy",
-   "The Minecraft Realm"
- ]},
-
-{q:"What force keeps planets in orbit around the Sun?",
- a:"Gravity",
- c:[
-   "Gravity",
-   "Magnetism",
-   "Dark Matter",
-   "Super Glue"
- ]},
-
-{q:"What is the largest planet in the solar system?",
- a:"Jupiter",
- c:[
-   "Jupiter",
-   "Saturn",
-   "Uranus",
-   "Planet McHugeface"
- ]},
-
-{q:"Which planet is known as the Red Planet?",
- a:"Mars",
- c:[
-   "Mars",
-   "Venus",
-   "Jupiter",
-   "The Angry Planet"
- ]},
-
-{q:"Name all the terrestrial planets.",
- a:"Mercury, Venus, Earth, Mars",
- c:[
-   "Mercury, Venus, Earth, Mars",
-   "Jupiter, Saturn, Uranus, Neptune",
-   "Earth, Mars, Jupiter, Venus",
-   "All of them including Pluto riding a skateboard"
- ]},
-
-{q:"Which planets are gas giants?",
- a:"Jupiter, Saturn",
- c:[
-   "Jupiter, Saturn",
-   "Mercury, Earth, Mars, Venus",
-   "Earth, Jupiter, Pluto, Mars",
-   "The ones that go brrrr"
- ]},
-
-{q:"What is the name of our galaxy’s nearest large galactic neighbor?",
- a:"Andromeda",
- c:[
-   "Andromeda",
-   "Milky Way",
-   "Triangulum",
-   "Disneyland Galaxy"
- ]},
-
-{q:"What is the center of a solar system called?",
- a:"The star",
- c:[
-   "The star",
-   "The biggest planet",
-   "The asteroid belt",
-   "The chicken nugget core"
- ]},
-
-{q:"What protects Earth from solar radiation?",
- a:"The magnetic field",
- c:[
-   "The magnetic field",
-   "The ozone layer",
-   "The Van Allen belts",
-   "A giant cosmic sunscreen"
- ]},
-
-{q:"What do we call a star at the end of its lifecycle that explodes?",
- a:"Supernova",
- c:[
-   "Supernova",
-   "Nebula",
-   "Red Giant",
-   "Star go boom"
- ]},
-
-{q:"What is a galaxy?",
- a:"A huge collection of stars, gas, and dust",
- c:[
-   "A huge collection of stars, gas, and dust",
-   "Just a bunch of planets",
-   "A single star",
-   "A space burrito"
- ]},
-
-{q:"What is the name of Earth’s moon?",
- a:"The Moon",
- c:[
-   "The Moon",
-   "Luna Prime",
-   "Europa",
-   "Cheese Orb"
- ]},
-
-{q:"What are comets mostly made of?",
- a:"Ice and dust",
- c:[
-   "Ice and dust",
-   "Hot lava",
-   "Metal",
-   "Frozen tears of astronauts"
- ]},
-
-{q:"What phase happens when the Moon is completely dark?",
- a:"New Moon",
- c:[
-   "New Moon",
-   "Full Moon",
-   "Crescent Moon",
-   "Moon turned off to save power"
- ]},
-
-{q:"What is the hottest planet in the solar system?",
- a:"Venus",
- c:[
-   "Venus",
-   "Mercury",
-   "Jupiter",
-   "Hot Pocket Planet"
- ]},
-
-{q:"What planet has a big red storm called the Great Red Spot?",
- a:"Jupiter",
- c:[
-   "Jupiter",
-   "Mars",
-   "Saturn",
-   "Angry Circle Thing"
- ]},
-
-{q:"What shape are most galaxies?",
- a:"Spiral",
- c:[
-   "Spiral",
-   "Square",
-   "Triangle",
-   "Donut-shaped munchies"
- ]},
-
-{q:"What is the name of the nearest black hole we’ve detected?",
- a:"Sagittarius A*",
- c:[
-   "Sagittarius A*",
-   "Andromeda B",
-   "Alpha Hole",
-   "Space Vacuum Cleaner"
- ]},
-
-{q:"What is a light-year?",
- a:"The distance light travels in one year",
- c:[
-   "The distance light travels in one year",
-   "A measure of time",
-   "How long stars live",
-   "A year with extra photons"
- ]},
-
-{q:"What do we call frozen rocks entering Earth’s atmosphere?",
- a:"Meteors",
- c:[
-   "Meteors",
-   "Asteroids",
-   "Comets",
-   "Fire shooting space peas"
- ]},
-
-{q:"What happens when a star collapses under its own gravity?",
- a:"It becomes a black hole",
- c:[
-   "It becomes a black hole",
-   "It becomes a comet",
-   "It explodes immediately",
-   "It goes to sleep forever"
- ]},
-
-{q:"Why does the Moon have phases?",
- a:"We see different amounts of its lit side",
- c:[
-   "We see different amounts of its lit side",
-   "It changes size",
-   "The Sun turns it",
-   "It’s moody"
- ]},
-
-{q:"What planet rotates on its side?",
- a:"Uranus",
- c:[
-   "Uranus",
-   "Neptune",
-   "Jupiter",
-   "The goofy tilted one"
- ]},
-
-{q:"What do astronauts need to breathe in space?",
- a:"Oxygen",
- c:[
-   "Oxygen",
-   "Carbon dioxide",
-   "Hydrogen",
-   "Stardust"
- ]},
-
-{q:"What creates the auroras?",
- a:"Solar wind interacting with Earth’s magnetic field",
- c:[
-   "Solar wind interacting with Earth’s magnetic field",
-   "Lightning from space",
-   "Volcanoes erupting",
-   "Cosmic disco lights"
- ]},
-
-{q:"What is space made of?",
-  a:"Unknown dark matter and energy",
-  c:[
-    "Unknown dark matter and energy",
-    "Helium and gas",
-    "Ranch Dressing",
-    "MASSIVE low taper fades"
-  ]}
+// obvious joke/wrong answers
+const jokeAnswers = [
+  "A giant light bulb in the sky",
+  "The Minecraft Realm",
+  "Super Glue",
+  "Planet McHugeface",
+  "The Angry Planet",
+  "All of them including Pluto riding a skateboard",
+  "The ones that go brrrr",
+  "Disneyland Galaxy",
+  "The chicken nugget core",
+  "A giant cosmic sunscreen",
+  "Star go boom",
+  "A space burrito",
+  "Cheese Orb",
+  "Frozen tears of astronauts",
+  "Moon turned off to save power",
+  "Hot Pocket Planet",
+  "Angry Circle Thing",
+  "Donut-shaped munchies",
+  "Alpha Hole",
+  "Space Vacuum Cleaner",
+  "A year with extra photons",
+  "Fire shooting space peas",
+  "It’s moody",
+  "The goofy tilted one",
+  "Stardust",
+  "Cosmic disco lights",
+  "Ranch Dressing",
+  "MASSIVE low taper fades"
 ];
 
-shuffle(questions); // shuffle at start
+// FULL QUESTION BANK
+const questions = [
+  {q:"What is the closest star to Earth?", a:"The Sun", c:["The Sun","Proxima Centauri","Alpha Centauri","A giant light bulb in the sky"]},
+  {q:"Which galaxy do we live in?", a:"The Milky Way", c:["The Milky Way","Andromeda","Triangulum Galaxy","The Minecraft Realm"]},
+  {q:"What force keeps planets in orbit around the Sun?", a:"Gravity", c:["Gravity","Magnetism","Dark Matter","Super Glue"]},
+  {q:"What is the largest planet in the solar system?", a:"Jupiter", c:["Jupiter","Saturn","Uranus","Planet McHugeface"]},
+  {q:"Which planet is known as the Red Planet?", a:"Mars", c:["Mars","Venus","Jupiter","The Angry Planet"]},
+  {q:"Name all the terrestrial planets.", a:"Mercury, Venus, Earth, Mars", c:["Mercury, Venus, Earth, Mars","Jupiter, Saturn, Uranus, Neptune","Earth, Mars, Jupiter, Venus","All of them including Pluto riding a skateboard"]},
+  {q:"Which planets are gas giants?", a:"Jupiter, Saturn", c:["Jupiter, Saturn","Mercury, Earth, Mars, Venus","Earth, Jupiter, Pluto, Mars","The ones that go brrrr"]},
+  {q:"What is the name of our galaxy’s nearest large galactic neighbor?", a:"Andromeda", c:["Andromeda","Milky Way","Triangulum","Disneyland Galaxy"]},
+  {q:"What is the center of a solar system called?", a:"The star", c:["The star","The biggest planet","The asteroid belt","The chicken nugget core"]},
+  {q:"What protects Earth from solar radiation?", a:"The magnetic field", c:["The magnetic field","The ozone layer","The Van Allen belts","A giant cosmic sunscreen"]},
+  {q:"What do we call a star at the end of its lifecycle that explodes?", a:"Supernova", c:["Supernova","Nebula","Red Giant","Star go boom"]},
+  {q:"What is a galaxy?", a:"A huge collection of stars, gas, and dust", c:["A huge collection of stars, gas, and dust","Just a bunch of planets","A single star","A space burrito"]},
+  {q:"What is the name of Earth’s moon?", a:"The Moon", c:["The Moon","Luna Prime","Europa","Cheese Orb"]},
+  {q:"What are comets mostly made of?", a:"Ice and dust", c:["Ice and dust","Hot lava","Metal","Frozen tears of astronauts"]},
+  {q:"What phase happens when the Moon is completely dark?", a:"New Moon", c:["New Moon","Full Moon","Crescent Moon","Moon turned off to save power"]},
+  {q:"What is the hottest planet in the solar system?", a:"Venus", c:["Venus","Mercury","Jupiter","Hot Pocket Planet"]},
+  {q:"What planet has a big red storm called the Great Red Spot?", a:"Jupiter", c:["Jupiter","Mars","Saturn","Angry Circle Thing"]},
+  {q:"What shape are most galaxies?", a:"Spiral", c:["Spiral","Square","Triangle","Donut-shaped munchies"]},
+  {q:"What is the name of the nearest black hole we’ve detected?", a:"Sagittarius A*", c:["Sagittarius A*","Andromeda B","Alpha Hole","Space Vacuum Cleaner"]},
+  {q:"What is a light-year?", a:"The distance light travels in one year", c:["The distance light travels in one year","A measure of time","How long stars live","A year with extra photons"]},
+  {q:"What do we call frozen rocks entering Earth’s atmosphere?", a:"Meteors", c:["Meteors","Asteroids","Comets","Fire shooting space peas"]},
+  {q:"What happens when a star collapses under its own gravity?", a:"It becomes a black hole", c:["It becomes a black hole","It becomes a comet","It explodes immediately","It goes to sleep forever"]},
+  {q:"Why does the Moon have phases?", a:"We see different amounts of its lit side", c:["We see different amounts of its lit side","It changes size","The Sun turns it","It’s moody"]},
+  {q:"What planet rotates on its side?", a:"Uranus", c:["Uranus","Neptune","Jupiter","The goofy tilted one"]},
+  {q:"What do astronauts need to breathe in space?", a:"Oxygen", c:["Oxygen","Carbon dioxide","Hydrogen","Stardust"]},
+  {q:"What creates the auroras?", a:"Solar wind interacting with Earth’s magnetic field", c:["Solar wind interacting with Earth’s magnetic field","Lightning from space","Volcanoes erupting","Cosmic disco lights"]},
+  {q:"What is space made of?", a:"Unknown dark matter and energy", c:["Unknown dark matter and energy","Helium and gas","Ranch Dressing","MASSIVE low taper fades"]}
+];
+
+shuffle(questions);
 
 let index = 0;
 let currentQuestion = null;
 
 function nextQuestion() {
-    if(index === 0){ shuffle(questions); } // reshuffle when looping back
+    if(index === 0){ shuffle(questions); }
 
     currentQuestion = questions[index];
 
@@ -317,7 +151,7 @@ function nextQuestion() {
 
     index++;
     if(index >= questions.length){
-        index = 0; // loop
+        index = 0;
     }
 
     document.getElementById("result").innerText = "";
@@ -332,7 +166,14 @@ function checkAnswer(){
     let selected = document.querySelector('input[name="answer"]:checked');
     if(!selected) return;
 
-    if(selected.value === currentQuestion.a){
+    const val = selected.value;
+
+    if(jokeAnswers.includes(val)){
+        showAreYouStupid();
+        return;
+    }
+
+    if(val === currentQuestion.a){
         document.getElementById("result").innerText = "Correct!";
     } else {
         document.getElementById("result").innerText = "Incorrect.";
@@ -341,7 +182,21 @@ function checkAnswer(){
     setTimeout(nextQuestion, 1000);
 }
 
-// Press Enter to submit if enabled
+function showAreYouStupid(){
+    document.getElementById("choices").innerHTML = "";
+    document.getElementById("submit-btn").disabled = true;
+
+    document.getElementById("result").innerHTML = `
+        Are you stupid?<br><br>
+        <button onclick="stupidYes()">Yes</button>
+        <button onclick="stupidNo()">No</button>
+    `;
+}
+
+function stupidNo(){
+    nextQuestion();
+}
+
 document.addEventListener("keydown", function(event){
     if(event.key === "Enter"){
         const submitBtn = document.getElementById("submit-btn");
@@ -355,5 +210,3 @@ nextQuestion();
 </script>
 </body>
 </html>
-
-
